@@ -14,6 +14,8 @@ def project(priceNotification, priceBottom, email_address, shopping_url):
     # web scraping source 1 : individual websites
     # test purpose : in the future prepare for scraping static shopping websites like jb hifi or mwave
 
+
+
     URL = 'https://www.dell.com/en-au/shop/dell-ultrasharp-27-4k-usb-c-hub-monitor-u2723qe/apd/210-bdzq/monitors' \
           '-monitor-accessories '
     page = requests.get(URL)
