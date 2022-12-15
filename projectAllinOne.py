@@ -38,6 +38,21 @@ def project(priceNotification, priceBottom, email_address, shopping_url):
     # add sec url to the url list
     linkList.append(URL2)
 
+
+
+    URL3 = "https://www.covid19data.com.au/"
+    page3 = requests.get(URL3)
+    soup = BeautifulSoup(page3.content, 'html.parser')
+    results3 = soup.find('span', class_='igc-table-cell-span')
+    print(results3)
+
+
+
+
+
+
+
+
     # section 2
     # web scraping source 2 : google shopping price table
 
@@ -56,80 +71,112 @@ def project(priceNotification, priceBottom, email_address, shopping_url):
 
     # Now, we could simply apply bs4 to html variable , like we always do
     soup = BeautifulSoup(html, "html.parser")
-    product_title = soup.find("a", {'class': 'BvQan sh-t__title sh-t__title-pdp translate-content'})
-    print("successfully scraped the product name: "+product_title.text)
-    product_name = product_title.text  # get product name to send in email
-    priceTable = soup.find('table', {'id': 'sh-osd__online-sellers-grid'})
-    priceRow = priceTable.find_all('div', {'class': 'drzWO'})
-    joinedList = pricelist1 + pricelist2
 
-    # get/scrape url
-    # add href to the url List
-    urls = priceTable.find_all('a', {'class': "shntl FkMp"})
-    base_url = 'https://www.google.com'
+    # print(soup.find("tr")["style"])
 
-    # add full url into the url list
-    for eachLink in urls:
-        # we need to add base url in front of each link
-        linkList.append(base_url + eachLink['href'])
+    mydivs = soup.find_all("div", {"class": "igc-table-outer"})
+    print(mydivs)
+
+    test1 = soup.find_all("div", class_="ig-container relative zeropadding embed-mode")
+    print(test1)
+
+    # print(soup.prettify())
+
+    print(soup.title)
+
+    spans = soup.find_all('span', {'class': 'igc-table-cell-span'})
+    print(spans)
 
 
-    print(linkList)
 
-    # add each price in the google shopping table into price list
-    count = 0
-    for price in priceRow:
-        pricelist3 = re.findall("\d+\.\d+", price.text)
-        joinedList += pricelist3
-        # print(re.findall("\d+\.\d+", price.text))
+    print("aa")
+    aaa = soup.find_all("tr",  {"class": ["igc-table-cell", "xyz"]})
+    print(aaa)
 
-        count = count + 1
-        if (count == 100):
-            break
 
-    driver.close()  # closing the webdriver
-    print(joinedList)
 
-    # write price and url lists to csv file
-    with open('priceAndUrl.csv', 'w') as csv_file:
-        csv_writer = csv.writer(csv_file, delimiter=',')
-        csv_writer.writerow(joinedList)
-        csv_writer.writerow(linkList)
+    rows = soup.find_all("td", class_= "igc-table-cell")
+    print(rows)
 
-    # put data(price and url list) into files we can process
+    for name in soup.find_all("td", class_="igc-table-cell"):
+        print(name)
 
-    # create a new pandas.df file . in columns , column name: price , link (url)
-    data = {'price': joinedList, 'link': linkList}
-    df = pd.DataFrame(data, columns=['price', 'link'])
-    # set a starting original price 
-    price_lowest = 100000.00
-    price_lowest_link = ""
-    # input
-    price_expectation = priceNotification
-    price_bottom = priceBottom
+    # print(    soup.find_all('span'))
+    dataTable = soup.find('table', {'id': 'igc-table __dynamic'})
+    print(dataTable)
 
-    # simple algorithm: find cheapest one under our expectation price and above the bottom-price(avoid fake goods)
-    # iterate df rows to find the lowest price under our input parameter(threshold)
-    for index, row in df.iterrows():
-        if float(row["price"]) < price_expectation:
-            if (float(row["price"]) < price_lowest) & (float(row["price"]) > price_bottom):
-                price_lowest = float(row["price"])
-                price_lowest_link = row["link"]
-
-    # test if we get the price and url
-    print(price_lowest)
-    print(price_lowest_link)
+    #
+    #
+    # product_title = soup.find("a", {'class': 'BvQan sh-t__title sh-t__title-pdp translate-content'})
+    # print("successfully scraped the product name: "+product_title.text)
+    # product_name = product_title.text  # get product name to send in email
+    # priceTable = soup.find('table', {'id': 'igc-table __dynamic'})
+    # priceRow = priceTable.find_all('div', {'class': 'drzWO'})
+    # joinedList = pricelist1 + pricelist2
+    #
+    # # get/scrape url
+    # # add href to the url List
+    # urls = priceTable.find_all('a', {'class': "shntl FkMp"})
+    # base_url = 'https://www.google.com'
+    #
+    # # add full url into the url list
+    # for eachLink in urls:
+    #     # we need to add base url in front of each link
+    #     linkList.append(base_url + eachLink['href'])
+    #
+    #
+    # print(linkList)
+    #
+    # # add each price in the google shopping table into price list
+    # count = 0
+    # for price in priceRow:
+    #     pricelist3 = re.findall("\d+\.\d+", price.text)
+    #     joinedList += pricelist3
+    #     # print(re.findall("\d+\.\d+", price.text))
+    #
+    #     count = count + 1
+    #     if (count == 100):
+    #         break
+    #
+    # driver.close()  # closing the webdriver
+    # print(joinedList)
+    #
+    # # write price and url lists to csv file
+    # with open('priceAndUrl.csv', 'w') as csv_file:
+    #     csv_writer = csv.writer(csv_file, delimiter=',')
+    #     csv_writer.writerow(joinedList)
+    #     csv_writer.writerow(linkList)
+    #
+    # # put data(price and url list) into files we can process
+    #
+    # # create a new pandas.df file . in columns , column name: price , link (url)
+    # data = {'price': joinedList, 'link': linkList}
+    # df = pd.DataFrame(data, columns=['price', 'link'])
+    # # set a starting original price
+    # price_lowest = 100000.00
+    # price_lowest_link = ""
+    # # input
+    # price_expectation = priceNotification
+    # price_bottom = priceBottom
+    #
+    # # simple algorithm: find cheapest one under our expectation price and above the bottom-price(avoid fake goods)
+    # # iterate df rows to find the lowest price under our input parameter(threshold)
+    # for index, row in df.iterrows():
+    #     if float(row["price"]) < price_expectation:
+    #         if (float(row["price"]) < price_lowest) & (float(row["price"]) > price_bottom):
+    #             price_lowest = float(row["price"])
+    #             price_lowest_link = row["link"]
+    #
+    # # test if we get the price and url
+    # print(price_lowest)
+    # print(price_lowest_link)
 
     # section 3 : send email by SMTP
 
     # below is plain text email message
 
-    message = """Subject: {} - price dropped!!!
-
-    
-    The lowest price is {}
-    Go to the link immediately to take it back home now!!
-    {}""".format(product_name, price_lowest, price_lowest_link)
+    message = """Subject: {} - covid data mined!!!
+""".format(product_name)
 
     import smtplib
     import ssl
@@ -147,8 +194,14 @@ def project(priceNotification, priceBottom, email_address, shopping_url):
         server.sendmail(sender, recipient, message)
 
 
-web1 = "https://www.google.com/shopping/product/8300897844992207877/offers?q=airpods+pro&prds=cid" \
-       ":8300897844992207877,cs:1,eto:2754270653443076419_0,pid:3006283522005438348,rsk:PC_7827190084446473420," \
-       "scoring:tp "
+# web1 = "https://www.google.com/shopping/product/8300897844992207877/offers?q=airpods+pro&prds=cid" \
+#        ":8300897844992207877,cs:1,eto:2754270653443076419_0,pid:3006283522005438348,rsk:PC_7827190084446473420," \
+#        "scoring:tp "
+
+web2 = "https://www.google.com/shopping/product/11604313020706474474/offers?q=iphone+14+pro&prds=cid:11604313020706474474,cs:1,eto:11620229282899578726_0,pid:14700905957874494492,rsk:PC_249950349010311029,scoring:tp"
+# web2 = "https://www.google.com/shopping/product/14684305604817377199/offers?q=dell+u2723qe&sxsrf=ALiCzsaiM6ttvK4VuJ8u-9oy5jGJDOMzYA:1665635981111&biw=2844&bih=1512&dpr=0.9&prds=eto:18190159235136610842_0,pid:3835976291685028753,rsk:PC_2758304187427070816&sa=X&ved=0ahUKEwjQqejIsdz6AhXK4nMBHb4kAyAQ3q4ECI8R"
 # run the project file
-project(350, 200, "kevinwjh520@gmail.com", web1)
+
+
+web3 = "https://www.covid19data.com.au/"
+project(350, 200, "kevinwjh520@gmail.com", web3)
